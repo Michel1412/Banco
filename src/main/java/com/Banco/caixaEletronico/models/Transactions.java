@@ -25,11 +25,11 @@ public class Transactions {
     @Column(name = "transaction_date")
     private Date transactionDate;//dia e horario
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "source_account_id")
     private BankAccount sourceAccountId;//conta origem
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "target_account_id")
     private BankAccount targetAccountId;//conta destino
 
