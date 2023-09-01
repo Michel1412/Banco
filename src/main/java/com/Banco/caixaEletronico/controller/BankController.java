@@ -23,7 +23,7 @@ public class BankController {
     }
 
     @GetMapping(value = "/all-banks")
-    public ResponseEntity<List<Bank>> getAllBanks(@RequestBody Bank bank){
+    public ResponseEntity<List<Bank>> getAllBanks(){
         return ResponseEntity.ok(this.bankService.findAllBanks());
     }
 

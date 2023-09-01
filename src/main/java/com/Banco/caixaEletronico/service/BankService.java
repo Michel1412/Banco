@@ -2,10 +2,10 @@ package com.Banco.caixaEletronico.service;
 
 
 import com.Banco.caixaEletronico.models.Bank;
+import com.Banco.caixaEletronico.repository.AgencyRepository;
 import com.Banco.caixaEletronico.repository.BankRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -13,10 +13,16 @@ import java.util.List;
 public class BankService {
 
     private final BankRepository bankRepository;
+    private final AgencyRepository agencyRepository;
 
 
-    public BankService(BankRepository bankRepository) {
+    public BankService(BankRepository bankRepository, AgencyRepository agencyRepository) {
         this.bankRepository = bankRepository;
+        this.agencyRepository = agencyRepository;
+    }
+
+    public boolean validateBankExistsByName(String bankName) {
+        return this.bankRepository.countBanksByName(bankName);
     }
 
     public ResponseEntity<Object> registerBank(Bank bank) {
@@ -26,11 +32,8 @@ public class BankService {
         return ResponseEntity.ok(this.bankRepository.save(bank));
     }
 
-    private boolean validateBankExistsByName(String bankName) {
-        return this.bankRepository.countBanksByName(bankName);
-    }
 
-    private boolean validateBankExistsByBankNumber(Integer bank) {
+    public boolean validateBankExistsByBankNumber(Integer bank) {
         return this.bankRepository.countByBankNumber(bank);
     }
     public List<Bank> findAllBanks() {
@@ -41,6 +44,9 @@ public class BankService {
     }
 
     public void deleteById(Integer id) {
+        if (this.agencyRepository.countAgencysByBank(id)) {
+            throw new RuntimeException("Esse banco ainda possui agencias abertas, é preciso deletalas!");
+        }
         this.bankRepository.deleteById(id);
     }
 
