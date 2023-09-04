@@ -4,6 +4,7 @@ package com.Banco.caixaEletronico.controller;
 import com.Banco.caixaEletronico.dtos.AgencyDto;
 import com.Banco.caixaEletronico.models.BankAgency;
 import com.Banco.caixaEletronico.service.AgencyService;
+import org.aspectj.bridge.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +35,9 @@ public class AgencyController {
     }
 
     @DeleteMapping("/delete-agency/{id}")
-    public ResponseEntity deleteAgency(@PathVariable Integer id) {
-        this.agencyService.deleteAgency(id);
-        return ResponseEntity.status(HttpStatus.OK);
+    public ResponseEntity<Object> deleteAgency(@PathVariable Integer id) {
+        return ResponseEntity.ok(this.agencyService.deleteAgency(id));
+
     }
 
     @GetMapping("/list-agency-by-bank/{id}")

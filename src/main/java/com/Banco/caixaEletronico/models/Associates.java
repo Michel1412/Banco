@@ -5,7 +5,6 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-
 @Entity
 @Data
 @Table(name = "associates")
