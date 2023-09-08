@@ -19,9 +19,7 @@ public class AccountDto {
     @NotNull
     private Integer associateId;
 
-    @NotNull
     private BigDecimal balance;
 
-    @NotNull
     private BigDecimal transactionLimit;
 }

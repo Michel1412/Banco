@@ -36,10 +36,6 @@ public interface AgencyRepository extends JpaRepository<BankAgency, Integer> {
     boolean countAgencysByBank(@Param("bankNumber") Integer bankNumber);
 
     @Query(nativeQuery = true,
-            value = "SELECT COUNT(*) ")
-    boolean findByBank(@Param("bankNumber") Integer id);
-
-    @Query(nativeQuery = true,
             value = "SELECT * " +
                     "FROM bank_agency a " +
                     "JOIN bank b ON b.bank_number = a.bank " +

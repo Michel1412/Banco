@@ -2,12 +2,10 @@ package com.Banco.caixaEletronico.service;
 
 
 import com.Banco.caixaEletronico.dtos.AgencyDto;
-import com.Banco.caixaEletronico.models.Bank;
 import com.Banco.caixaEletronico.models.BankAgency;
+import com.Banco.caixaEletronico.repository.AccontRepository;
 import com.Banco.caixaEletronico.repository.AgencyRepository;
 import com.Banco.caixaEletronico.repository.BankRepository;
-import org.aspectj.bridge.Message;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +18,15 @@ public class AgencyService {
     private final AgencyRepository agencyRepository;
     private final BankRepository bankRepository;
     private final BankService bankService;
+    private final AccontRepository accountRepository;
 
 
-    public AgencyService(AgencyRepository agencyRepository, BankRepository bankRepository, BankService bankService) {
+
+    public AgencyService(AgencyRepository agencyRepository, BankRepository bankRepository, BankService bankService, AccontRepository accountRepository) {
         this.agencyRepository = agencyRepository;
         this.bankRepository = bankRepository;
         this.bankService = bankService;
+        this.accountRepository = accountRepository;
     }
 
     public Object registerAgency(AgencyDto agencyDto) {
@@ -59,15 +60,12 @@ public class AgencyService {
         if (this.validateAgencyExists(agencyDto)) {
             throw  new RuntimeException("Agencia já cadastrada!");
         }
-//        if (this.bankService.validateBankExistsByBankNumber(agencyDto.getBankNumber())) {
-//            throw new RuntimeException("Banco invalido!");
-//        }
         BankAgency renameAgency = this.findAgencyById(id);
         renameAgency.setAgencyNumber(agencyDto.getAgencyNumber());
         return ResponseEntity.ok(this.agencyRepository.save(renameAgency));
     }
 
-    protected BankAgency findAgencyById(Integer id) {
+    public BankAgency findAgencyById(Integer id) {
         return this.agencyRepository.findById(id).orElseThrow(() -> {
             return new RuntimeException("Agência não encontrada!");
         });
@@ -79,6 +77,9 @@ public class AgencyService {
 
 
     public String deleteAgency(Integer id) {
+        if (this.accountRepository.countAllByAgency(id)) {
+            throw new RuntimeException("Não é posivel deleta, essa agencia tem contas cadastradas!");
+        }
         this.agencyRepository.deleteById(id);
         return "Agencia deletada com sucesso!";
     }
