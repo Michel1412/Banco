@@ -71,11 +71,6 @@ public class AgencyService {
         });
     }
 
-    public boolean validateAgencyExists(AgencyDto agencyDto) {
-        return this.agencyRepository.countAgencysByAgencyNumberAndBank(agencyDto.getAgencyNumber(), agencyDto.getBankNumber());
-    }
-
-
     public String deleteAgency(Integer id) {
         if (this.accountRepository.countAllByAgency(id)) {
             throw new RuntimeException("Não é posivel deleta, essa agencia tem contas cadastradas!");
@@ -94,4 +89,9 @@ public class AgencyService {
         }
         return this.agencyRepository.findAllByBank(id);
     }
+
+    public boolean validateAgencyExists(AgencyDto agencyDto) {
+        return this.agencyRepository.countAgencysByAgencyNumberAndBank(agencyDto.getAgencyNumber(), agencyDto.getBankNumber());
+    }
+
 }

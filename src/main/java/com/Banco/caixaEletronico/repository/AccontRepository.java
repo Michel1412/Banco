@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+
 @Repository
 public interface AccontRepository extends JpaRepository<BankAccount, Integer> {
 
@@ -34,4 +36,10 @@ public interface AccontRepository extends JpaRepository<BankAccount, Integer> {
                     "JOIN bank_agency ba2 ON ba.agency = ba2.id " +
                     "WHERE ba.agency = :agencyId ")
     boolean countAllByAgency(@Param("agencyId") Integer agencyId);
+
+    @Query(nativeQuery = true,
+            value = "SELECT ba.balance " +
+                    "FROM bank_account ba " +
+                    "WHERE ba.id = :bankAccount")
+    BigDecimal findBalanceById(@Param("bankAccount") BankAccount bankAccount);
 }

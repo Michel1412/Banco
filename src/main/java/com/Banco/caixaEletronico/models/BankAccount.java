@@ -28,8 +28,6 @@ public class BankAccount {
     @Column(name = "balance")
     private BigDecimal balance;
 
-    @Column(name = "transaction_limit")
-    private BigDecimal transactionLimit;
 }
 
 

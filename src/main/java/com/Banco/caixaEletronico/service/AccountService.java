@@ -35,7 +35,7 @@ public class AccountService {
             throw new RuntimeException("Essa conta já foi criada!");
         }
         this.associateService.validateAssociateById(accountDto.getAssociateId());
-        if (!this.accountRepository.countAccountOnAgencyByBankAndAssociateId(accountDto.getAssociateId(),accountDto.getAgencyId())) {
+        if (this.accountRepository.countAccountOnAgencyByBankAndAssociateId(accountDto.getAssociateId(),accountDto.getAgencyId())) {
             throw new RuntimeException("Esse associado já faz parte desse banco!");
         }
         BankAccount bankAccount = new BankAccount();
@@ -43,7 +43,6 @@ public class AccountService {
         bankAccount.setAgencyId(this.agencyService.findAgencyById(accountDto.getAgencyId()));
         bankAccount.setAssociateId(this.associateService.findAssociateById(accountDto.getAssociateId()));
         bankAccount.setBalance(accountDto.getBalance());
-        bankAccount.setTransactionLimit(accountDto.getBalance().multiply(new BigDecimal(".3")));
         return ResponseEntity.ok(this.accountRepository.save(bankAccount));
     }
 
@@ -80,4 +79,9 @@ public class AccountService {
         targetAccountId.setBalance(targetAccountId.getBalance().add(transactionValue));
         this.accountRepository.save(targetAccountId);
     }
+
+    public BigDecimal findBalanceById(BankAccount bankAccount) {
+        return this.accountRepository.findBalanceById(bankAccount);
+    }
+
 }

@@ -21,20 +21,12 @@ public class BankService {
         this.agencyRepository = agencyRepository;
     }
 
-    public boolean validateBankExistsByName(String bankName) {
-        return this.bankRepository.countBanksByName(bankName);
-    }
 
     public ResponseEntity<Object> registerBank(Bank bank) {
         if (this.validateBankExistsByName(bank.getBankName())) {
             throw new RuntimeException("Banco já cadastrado!");
         }
         return ResponseEntity.ok(this.bankRepository.save(bank));
-    }
-
-
-    public boolean validateBankExistsByBankNumber(Integer bank) {
-        return this.bankRepository.countByBankNumber(bank);
     }
     public List<Bank> findAllBanks() {
         if (this.bankRepository.findAll().isEmpty()){
@@ -59,11 +51,18 @@ public class BankService {
         return ResponseEntity.ok(this.bankRepository.save(bankId));
     }
 
-
-
     public Bank findBankById(Integer id) {
         return this.bankRepository.findById(id).orElseThrow(() -> {
             return new RuntimeException("Banco não encontrado!");
         });
     }
+
+    public boolean validateBankExistsByBankNumber(Integer bank) {
+        return this.bankRepository.countByBankNumber(bank);
+    }
+
+    public boolean validateBankExistsByName(String bankName) {
+        return this.bankRepository.countBanksByName(bankName);
+    }
+
 }

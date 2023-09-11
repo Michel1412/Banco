@@ -21,5 +21,4 @@ public class AccountDto {
 
     private BigDecimal balance;
 
-    private BigDecimal transactionLimit;
 }

@@ -38,6 +38,22 @@ public class AssociateService {
         return this.validateAssociateById(id);
     }
 
+    public Object replaceAssociate(Integer id, Associates associates) {
+        this.validateAllInfos(associates);
+        if (! this.associateRepository.validateAssociateExistsByDocumentNumber(associates.getDocumentNumber())) {
+            throw new RuntimeException("Esse documento não foi cadastrado!");
+        }
+        Associates renameAssociate = this.validateAssociateById(id);
+        renameAssociate.setName(associates.getName());
+        renameAssociate.setPhoneNumber(associates.getPhoneNumber());
+        renameAssociate.setSalary(associates.getSalary());
+        return ResponseEntity.ok(this.associateRepository.save(renameAssociate));
+    }
+
+    public Object deleteAssociate(Integer id) {
+        this.associateRepository.deleteById(id);
+        return ResponseEntity.ok("Associado deletado com sucesso!");
+    }
     public Associates validateAssociateById(Integer id) {
         return this.associateRepository.findById(id).orElseThrow( () -> {
             return new RuntimeException("Esse associado não foi cadastrado!");
@@ -61,22 +77,5 @@ public class AssociateService {
         if (! message.equals("Preencha o(s) campo(s):")) {
             throw new RuntimeException(message);
         }
-    }
-
-    public Object replaceAssociate(Integer id, Associates associates) {
-        this.validateAllInfos(associates);
-        if (! this.associateRepository.validateAssociateExistsByDocumentNumber(associates.getDocumentNumber())) {
-            throw new RuntimeException("Esse documento não foi cadastrado!");
-        }
-        Associates renameAssociate = this.validateAssociateById(id);
-        renameAssociate.setName(associates.getName());
-        renameAssociate.setPhoneNumber(associates.getPhoneNumber());
-        renameAssociate.setSalary(associates.getSalary());
-        return ResponseEntity.ok(this.associateRepository.save(renameAssociate));
-    }
-
-    public Object deleteAssociate(Integer id) {
-        this.associateRepository.deleteById(id);
-        return ResponseEntity.ok("Associado deletado com sucesso!");
     }
 }
