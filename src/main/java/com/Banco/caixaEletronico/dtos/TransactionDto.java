@@ -26,9 +26,4 @@ public class TransactionDto {
 
     private Integer targetAccountId;//conta destino
 
-
-//    Date dateRightNow = new Date();
-//    String today = new SimpleDateFormat("dd/MM/yyyy").format(dateRightNow);
-//    String hoursAndMinutes = new SimpleDateFormat("HH:mm").format(dateRightNow);
-
 }

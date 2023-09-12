@@ -35,11 +35,12 @@ public class BankService {
         return this.bankRepository.findAll();
     }
 
-    public void deleteById(Integer id) {
+    public String deleteById(Integer id) {
         if (this.agencyRepository.countAgencysByBank(id)) {
             throw new RuntimeException("Esse banco ainda possui agencias abertas, é preciso deletalas!");
         }
         this.bankRepository.deleteById(id);
+        return "Agencia deletada com sucesso!";
     }
 
     public Object replaceBank(Integer id, Bank bank) {
@@ -47,6 +48,7 @@ public class BankService {
             throw new RuntimeException("Banco já cadastrado!");
         }
         Bank bankId = this.findBankById(id);
+        bankId.setFullBalanceTransaction(bank.getFullBalanceTransaction());
         bankId.setBankName(bank.getBankName());
         return ResponseEntity.ok(this.bankRepository.save(bankId));
     }

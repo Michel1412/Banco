@@ -5,6 +5,7 @@ import com.Banco.caixaEletronico.dtos.TransactionDto;
 import com.Banco.caixaEletronico.service.TransactionsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -28,5 +29,10 @@ public class TransactionsController {
     @PostMapping("/create-transfer")
     public ResponseEntity<Object> createTransfer(@RequestBody TransactionDto transactionDto) {
         return ResponseEntity.ok(this.transactionsService.createTransaction(transactionDto, TransactionType.TRANSFER));
+    }
+
+    @PostMapping("/reversal-transfer/{id}")
+    public ResponseEntity<Object> reversalTransfer(@PathVariable Integer id) {
+        return ResponseEntity.ok(this.transactionsService.reversalTransfer(id));
     }
 }

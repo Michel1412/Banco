@@ -2,9 +2,7 @@ package com.Banco.caixaEletronico.controller;
 
 
 import com.Banco.caixaEletronico.models.Bank;
-import com.Banco.caixaEletronico.repository.BankRepository;
 import com.Banco.caixaEletronico.service.BankService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +12,11 @@ import java.util.List;
 @Controller
 public class BankController {
 
-    @Autowired
-    private BankService bankService;
+    private final BankService bankService;
+
+    public BankController(BankService bankService) {
+        this.bankService = bankService;
+    }
 
     @PostMapping(value = "/register-bank")
     public ResponseEntity<Object> registerBank(@RequestBody Bank bank ){
@@ -28,8 +29,8 @@ public class BankController {
     }
 
     @DeleteMapping(value = "/delete-bank/{id}")
-    public void deleteBank(@PathVariable Integer id){
-        this.bankService.deleteById(id);
+    public ResponseEntity<Object> deleteBank(@PathVariable Integer id){
+        return ResponseEntity.ok(this.bankService.deleteById(id));
     }
 
     @PutMapping(value = "/replace-bank/{id}")

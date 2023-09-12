@@ -71,12 +71,12 @@ public class AgencyService {
         });
     }
 
-    public String deleteAgency(Integer id) {
+    public Object deleteAgency(Integer id) {
         if (this.accountRepository.countAllByAgency(id)) {
             throw new RuntimeException("Não é posivel deleta, essa agencia tem contas cadastradas!");
         }
         this.agencyRepository.deleteById(id);
-        return "Agencia deletada com sucesso!";
+        return ResponseEntity.ok("Agencia deletada com sucesso!");
     }
 
     public List<BankAgency> findAgencyByBank(Integer id) {

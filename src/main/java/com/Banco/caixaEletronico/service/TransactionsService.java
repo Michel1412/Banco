@@ -5,7 +5,6 @@ import com.Banco.caixaEletronico.dtos.TransactionDto;
 import com.Banco.caixaEletronico.models.BankAccount;
 import com.Banco.caixaEletronico.models.Transactions;
 import com.Banco.caixaEletronico.repository.TransactionsRepository;
-import com.sun.istack.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +15,7 @@ import java.util.Objects;
 @Service
 public class TransactionsService {
 
+    Date dateToday = new Date();
     private final TransactionsRepository transactionsRepository;
     private final AccountService accountService;
 
@@ -29,8 +29,7 @@ public class TransactionsService {
             throw new RuntimeException("Não é possivel fazer uma transação com esse valor!");
         }
         Transactions transactions = new Transactions();
-        Date dateAtual = new Date();
-        transactions.setTransactionDate(dateAtual); // com horas
+        transactions.setTransactionDate(dateToday); // com horas
 
         switch (transactionType) {
             case DEPOSIT:
@@ -58,22 +57,35 @@ public class TransactionsService {
         }
         transactions.setTransactionValue(transactionDto.getTransactionValue());
         transactions.setTransactionType(transactionType.getDescript());
+        transactions.setStatus("aprovado");
         return ResponseEntity.ok(this.transactionsRepository.save(transactions));
     }
 
     private void transferValueInBalanceOfTarget(BankAccount targetAccountId, BigDecimal transactionValue, BankAccount sourceAccountId) {
         this.validateNumberOfWithdrawOrTransfer(sourceAccountId.getId(), TransactionType.TRANSFER.getDescript());
         this.compareAccountIsdiferents(sourceAccountId,targetAccountId);
-        this.validateIfAccountCanDo(transactionValue,sourceAccountId);
+        this.validateFullBalanceTransaction(transactionValue,sourceAccountId);
         this.accountService.updateBalance(targetAccountId,transactionValue);
-        this.accountService.updateBalance(sourceAccountId,transactionValue);
+        this.accountService.updateBalance(sourceAccountId,transactionValue.negate());
 
     }
 
     private void wihtdrawValueInBalanceOfTargetAccount(BankAccount sourceAccountId, BigDecimal transactionValue) {
         this.validateNumberOfWithdrawOrTransfer(sourceAccountId.getId(), TransactionType.WITHDRAW.getDescript());
-        this.validateIfAccountCanDo(transactionValue,sourceAccountId);
+        this.validateFullBalanceTransaction(transactionValue,sourceAccountId);
         this.accountService.updateBalance(sourceAccountId,transactionValue.negate());
+    }
+
+    private void validateFullBalanceTransaction(BigDecimal transactionValue, BankAccount sourceAccountId) {
+        BigDecimal balanceNow = this.accountService.findBalanceById(sourceAccountId);
+        BigDecimal fullBalanceTransaction = this.transactionsRepository.findFullBalnceByAccountId(sourceAccountId.getId());
+        if (balanceNow.compareTo(fullBalanceTransaction) > 0) {
+            this.validateIfAccountCanDo(transactionValue,sourceAccountId);
+        } else {
+            if (transactionValue.compareTo(balanceNow) > 0) {
+                throw new RuntimeException("A conta não tem saldo suficiente para fazer o saque!");
+            }
+        }
     }
 
     private void depositValueInBalanceOfTargetAccount(BankAccount targetAccountId, BigDecimal transactionValue) {
@@ -103,8 +115,29 @@ public class TransactionsService {
 
     public void validateNumberOfWithdrawOrTransfer(Integer sourceAccountId, String transactionType) {
 
-        if (this.transactionsRepository.countTransferOfSourceAccount(sourceAccountId, transactionType)) {
+        if (this.transactionsRepository.countTransactionsOfSourceAccount(sourceAccountId, transactionType)) {
             throw new RuntimeException("Essa conta já atingiu o limite de transferencias!");
         }
+    }
+
+    public Object reversalTransfer(Integer id) {
+        Transactions transferForReversal = this.transactionsRepository.findById(id).orElseThrow(() -> {
+            return new RuntimeException("Essa transação não foi encontrada!");});
+        BigDecimal reversalValue = transferForReversal.getTransactionValue();
+        this.accountService.updateBalance(transferForReversal.getTargetAccountId(), reversalValue.negate());
+        this.accountService.updateBalance(transferForReversal.getSourceAccountId(), reversalValue);
+        Transactions reversalSaveTransfer = new Transactions();
+        reversalSaveTransfer.setTargetAccountId(transferForReversal.getTargetAccountId());
+        reversalSaveTransfer.setSourceAccountId(transferForReversal.getSourceAccountId());
+        reversalSaveTransfer.setTransactionValue(reversalValue);
+        if (this.transactionsRepository.countReversalTransferByTargetAndSourceId(reversalSaveTransfer.getTargetAccountId(),reversalSaveTransfer.getSourceAccountId(), reversalValue)) {
+            throw new RuntimeException("Essa transação já foi estornada!");
+        }
+        reversalSaveTransfer.setTransactionDate(dateToday);
+        reversalSaveTransfer.setStatus("aprovado");
+        reversalSaveTransfer.setTransactionType("Estorno");
+        transferForReversal.setStatus("estornado");
+        this.transactionsRepository.save(transferForReversal);
+        return ResponseEntity.ok(this.transactionsRepository.save(reversalSaveTransfer));
     }
 }

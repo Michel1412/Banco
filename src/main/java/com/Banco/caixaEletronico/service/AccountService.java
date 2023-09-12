@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class AccountService {
@@ -42,7 +43,11 @@ public class AccountService {
         bankAccount.setAccountNumber(accountDto.getAccountNumber());
         bankAccount.setAgencyId(this.agencyService.findAgencyById(accountDto.getAgencyId()));
         bankAccount.setAssociateId(this.associateService.findAssociateById(accountDto.getAssociateId()));
-        bankAccount.setBalance(accountDto.getBalance());
+        if (Objects.isNull(accountDto.getBalance())) {
+            bankAccount.setBalance(new BigDecimal(0));
+        } else {
+            bankAccount.setBalance(accountDto.getBalance());
+        }
         return ResponseEntity.ok(this.accountRepository.save(bankAccount));
     }
 
@@ -56,7 +61,11 @@ public class AccountService {
     public Object updateAccount(Integer id, AccountDto accountDto) {
         BankAccount updateAccount = this.findAccountById(id);
         this.accountRepository.countAccountByAccountNumber(accountDto.getAccountNumber(), accountDto.getAgencyId());
-        updateAccount.setBalance(accountDto.getBalance());
+        if (Objects.isNull(accountDto.getBalance())) {
+            updateAccount.setBalance(new BigDecimal(0));
+        } else {
+            updateAccount.setBalance(accountDto.getBalance());
+        }
         updateAccount.setAccountNumber(accountDto.getAccountNumber());
         updateAccount.setAgencyId(this.agencyService.findAgencyById(accountDto.getAgencyId()));
         updateAccount.setAssociateId(this.associateService.findAssociateById(accountDto.getAssociateId()));
@@ -69,9 +78,9 @@ public class AccountService {
         });
     }
 
-    public String deleteAccount(Integer id) {
+    public Object deleteAccount(Integer id) {
         this.accountRepository.deleteById(id);
-        return "Sua conta foi deletada com sucesso!";
+        return ResponseEntity.ok("Sua conta foi deletada com sucesso!");
     }
 
     public void updateBalance(BankAccount targetAccountId, BigDecimal transactionValue) {

@@ -33,5 +33,6 @@ public class Transactions {
     @JoinColumn(name = "target_account_id")
     private BankAccount targetAccountId;//conta destino
 
-
+    @Column(name = "status")
+    private String status;
 }
