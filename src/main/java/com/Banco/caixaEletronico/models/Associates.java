@@ -5,7 +5,6 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-
 @Entity
 @Data
 @Table(name = "associates")
@@ -27,8 +26,6 @@ public class Associates {
     @Column(name = "salary")
     private BigDecimal salary;
 
-    @Column(name = "transaction_limit")
-    private BigDecimal transactionLimit;
 }
 
 

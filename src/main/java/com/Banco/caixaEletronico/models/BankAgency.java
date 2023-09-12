@@ -1,6 +1,7 @@
 package com.Banco.caixaEletronico.models;
 
 
+import com.sun.istack.NotNull;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -19,6 +20,6 @@ public class BankAgency {
     private Bank bankNumber;
 
     @Column(name = "agency_number")
-    private String agencyNumber;
+    private long agencyNumber;
 
 }
